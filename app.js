@@ -11,10 +11,8 @@ const db = require('./db');
 
 const app = express();
 
-const uri = 'mongodb+srv://hgAdmin:hg_forLIFE@malins-cluster-155rd.mongodb.net/game-score';
-
 const store = new MongoDBStore({
-  uri: uri,
+  uri: process.env.MONGO_DB_URI,
   collection: 'sessions',
 });
 
