@@ -13,7 +13,7 @@ const app = express();
 
 const store = new MongoDBStore({
   uri: process.env.MONGO_DB_URI,
-  collection: 'sessions',
+  collection: 'sessions'
 });
 
 app.use(bodyParser.json());
@@ -22,9 +22,15 @@ app.use(
     secret: 'thisgameisveryserious',
     resave: false,
     saveUninitialized: false,
-    store: store,
-  }),
+    store: store
+  })
 );
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 app.use(async (req, res, next) => {
   if (!req.session.team) return next();
