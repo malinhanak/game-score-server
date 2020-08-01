@@ -52,16 +52,14 @@ app.use((error, req, res, next) => {
   );
 });
 
-(async () => {
-  try {
-    await db.connect();
+db.connect()
+  .then(() => {
     app.listen(process.env.PORT || 4000, () => {
       console.log('App is running');
     });
-  } catch (err) {
+  })
+  .catch((err) => {
     console.error(`Connection error: ${err.stack} on Worker process: ${process.pid}`);
-    process.exit(1);
-  }
-})();
+  });
 
 module.exports = app;
