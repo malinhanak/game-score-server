@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 
 const HttpError = require('../models/errors/HttpError');
-const Team = require('../models/Team');
+const Team = require('../models/team');
 const { asyncWrapper } = require('../utils/asyncWrapper');
 
 async function create(req, res, next) {
