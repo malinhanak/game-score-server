@@ -6,6 +6,6 @@ const teamRouter = express.Router();
 teamRouter.route('/').get(teamController.getTeams).post(teamController.create);
 teamRouter.route('/get-score').get(teamController.getScore);
 
-teamRouter.route('/set-score').patch(teamController.setScore);
+teamRouter.route('/set-score/:name').patch(teamController.setScore);
 
 module.exports = teamRouter;
