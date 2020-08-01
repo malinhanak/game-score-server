@@ -29,10 +29,9 @@ async function create(req, res, next) {
 
   req.session.isOnline = true;
   req.session.team = team;
-  req.session.save();
 
   res.status(200);
-  return res.json({ message: 'Laget är nu skapat och inloggat' });
+  return res.json({ message: 'Laget är nu skapat och inloggat', name: req.body.nam });
 }
 
 async function setScore(req, res, next) {
