@@ -55,7 +55,7 @@ app.use((error, req, res, next) => {
 (async () => {
   try {
     await db.connect();
-    app.listen({ port: process.env.PORT || 4000 }, () => {
+    app.listen(process.env.PORT || 4000, () => {
       console.log('App is running on port  ' + PORT);
     });
   } catch (err) {
