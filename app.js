@@ -17,7 +17,7 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
-const corseOption = { origin: false };
+const corseOption = { origin: 'http://localhost:3000/' };
 
 app.use(cors(corseOption));
 app.use(bodyParser.json());
