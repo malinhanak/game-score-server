@@ -49,7 +49,7 @@ async function setScore(req, res, next) {
 }
 
 async function getScore(req, res, next) {
-  const team = await Team.findOne({ name: req.team.name });
+  const team = await Team.findOne({ name: req.body.name });
 
   if (!team) return next(new HttpError(`Hittar inga lag`));
 
