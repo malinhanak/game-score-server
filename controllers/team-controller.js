@@ -9,7 +9,7 @@ async function create(req, res, next) {
 
   if (alreadyExists) {
     return next(
-      new HttpError(`Välj ett annat namn, ett lag med namnet ${req.body.name} finns redan.`),
+      new HttpError(`Välj ett annat namn, ett lag med namnet ${req.body.name} finns redan.`)
     );
   }
 
@@ -18,6 +18,8 @@ async function create(req, res, next) {
   await createTeam.save();
 
   const team = await Team.findOne({ name: req.body.name });
+
+  console.log('team', team);
 
   if (!team) return next(new HttpError(`Laget finns inte!`));
 
@@ -68,7 +70,7 @@ async function getScore(req, res, next) {
 
   res.status(200);
   return res.json({
-    totalScore: calcPoints,
+    totalScore: calcPoints
   });
 }
 
@@ -79,7 +81,7 @@ async function getTeams(req, res, next) {
 
   res.status(200);
   return res.json({
-    teams: teams.map((team) => team.toObject({ getters: true })),
+    teams: teams.map((team) => team.toObject({ getters: true }))
   });
 }
 
