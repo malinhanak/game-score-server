@@ -10,7 +10,7 @@ const teamRouter = require('./routes/team-router');
 const db = require('./db');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+
 const store = new MongoDBStore({
   uri: process.env.MONGO_DB_URI,
   collection: 'sessions',
@@ -55,7 +55,7 @@ app.use((error, req, res, next) => {
 (async () => {
   try {
     await db.connect();
-    app.listen(PORT, () => {
+    app.listen({ port: process.env.PORT || 4000 }, () => {
       console.log('App is running on port  ' + PORT);
     });
   } catch (err) {
