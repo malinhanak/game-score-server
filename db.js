@@ -1,9 +1,11 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
+const uri = 'mongodb+srv://hgAdmin:hg_forLIFE@malins-cluster-155rd.mongodb.net/game-score';
+
 async function connect() {
   try {
-    await mongoose.connect(process.env.MONGO_DB_URI, {
+    await mongoose.connect(uri, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       useCreateIndex: true,
