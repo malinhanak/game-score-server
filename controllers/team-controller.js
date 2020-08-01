@@ -35,9 +35,6 @@ async function create(req, res, next) {
 }
 
 async function setScore(req, res, next) {
-  if (!req.team || req.session.team.name !== req.body.name) {
-    return next(new AuthorizationError('Du saknar behörighet'));
-  }
   const name = req.body.name;
   const team = await Team.findOne({ name: name });
 
@@ -52,10 +49,6 @@ async function setScore(req, res, next) {
 }
 
 async function getScore(req, res, next) {
-  if (!req.team || req.session.team.name !== req.body.name) {
-    return next(new HttpError('Du saknar behörighet'));
-  }
-
   const team = await Team.findOne({ name: req.team.name });
 
   if (!team) return next(new HttpError(`Hittar inga lag`));
