@@ -56,7 +56,7 @@ app.use((error, req, res, next) => {
   try {
     await db.connect();
     app.listen(process.env.PORT || 4000, () => {
-      console.log('App is running on port  ' + PORT);
+      console.log('App is running');
     });
   } catch (err) {
     console.error(`Connection error: ${err.stack} on Worker process: ${process.pid}`);
