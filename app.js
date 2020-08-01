@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+var cors = require('cors');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const HttpError = require('./models/errors/HttpError');
@@ -16,6 +17,9 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
+const corseOption = { origin: false };
+
+app.use(cors(corseOption));
 app.use(bodyParser.json());
 app.use(
   session({
