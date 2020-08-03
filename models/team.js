@@ -14,7 +14,8 @@ const TeamSchema = new Schema({
       message: 'Teamet existerar redan!'
     }
   },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  members: [String]
 });
 
 TeamSchema.plugin(uniqueValidator);
