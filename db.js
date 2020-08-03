@@ -1,18 +1,20 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
+const { DB_URI } = process.env;
+
 async function connect() {
   try {
-    await mongoose.connect(process.env.MONGO_DB_URI, {
+    await mongoose.connect(DB_URI, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       useCreateIndex: true
     });
 
-    console.log(`Connected to DB`);
+    console.info(`Koppling mot databasen etablerades`);
   } catch (error) {
-    console.error(`Something went wrong`, err);
-    // process.exit(1)
+    console.error(`Ett fel uppstod`, error);
+    process.exit(1);
   }
 }
 

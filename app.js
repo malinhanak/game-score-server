@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const mongoose = require('mongoose');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const HttpError = require('./models/errors/HttpError');
@@ -13,15 +12,17 @@ const db = require('./db');
 
 const app = express();
 
+const { DB_URI, SESS_LIFETIME, SESS_SECRET, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
+
 const store = new MongoDBStore({
-  uri: process.env.MONGO_DB_URI,
+  uri: DB_URI,
   collection: 'sessions',
-  ttl: parseInt(process.env.SESS_LIFETIME) / 1000
+  ttl: parseInt(SESS_LIFETIME) / 1000
 });
 
 app.use(bodyParser.json());
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
@@ -31,18 +32,18 @@ app.use(function (req, res, next) {
 
 app.use(
   session({
-    secret: 'thisgameisveryserious',
+    secret: SESS_SECRET,
     resave: false,
     saveUninitialized: false,
     store: store,
     cookie: {
       sameSite: true,
-      maxAge: parseInt(process.env.SESS_LIFETIME)
+      maxAge: parseInt(SESS_LIFETIME)
     }
   })
 );
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
@@ -65,7 +66,7 @@ app.use(async (req, res, next) => {
 app.use('/api/teams', teamRouter);
 
 app.use((req, res, next) => {
-  throw new HttpError('Kunde inte hitta vägen', 404);
+  throw new HttpError('Sökvägen hittades inte', 404);
 });
 
 app.use((error, req, res, next) => {
@@ -76,17 +77,15 @@ app.use((error, req, res, next) => {
 
 db.connect()
   .then(() => {
-    app.listen(process.env.PORT || 4000, () => {
-      console.log('App is running');
-    });
+    app.listen(process.env.PORT || 4000, () => console.info('Applikationen startade'));
     Admin.countDocuments({}, async (err, count) => {
-      if (err) throw new Error(`Error in counting documents: ${err}`);
+      if (err) throw new Error(`Fel uppstod i dokument beräknaren: ${err}`);
       if (count === 0) {
-        console.log('No admins found, creating one...');
+        console.log('Ingen Administratör hittades, skapar administratör...');
         const admin = new Admin({
-          username: process.env.ADMIN_EMAIL,
-          name: process.env.ADMIN_NAME,
-          password: process.env.ADMIN_PASS,
+          username: ADMIN_EMAIL,
+          name: ADMIN_NAME,
+          password: ADMIN_PASS,
           role: ['ADMIN']
         });
         await admin.save();
@@ -94,8 +93,7 @@ db.connect()
     });
   })
   .catch((err) => {
-    console.error(`Connection error: ${err.stack} on Worker process: ${process.pid}`);
-    console.error(err);
+    console.error('Fel uppstod', err);
   });
 
 module.exports = app;
