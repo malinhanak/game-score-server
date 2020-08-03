@@ -8,11 +8,20 @@ const HttpError = require('./models/errors/HttpError');
 const Team = require('./models/team');
 const Admin = require('./models/admin');
 const teamRouter = require('./routes/team-router');
+const sessionRouter = require('./routes/session-router');
 const db = require('./db');
 
 const app = express();
 
-const { DB_URI, SESS_LIFETIME, SESS_SECRET, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
+const {
+  DB_URI,
+  SESS_LIFETIME,
+  SESS_NAME,
+  SESS_SECRET,
+  ADMIN_EMAIL,
+  ADMIN_NAME,
+  ADMIN_PASS
+} = process.env;
 
 const store = new MongoDBStore({
   uri: DB_URI,
@@ -32,6 +41,7 @@ app.use((req, res, next) => {
 
 app.use(
   session({
+    name: SESS_NAME,
     secret: SESS_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -54,16 +64,25 @@ app.use(async (req, res, next) => {
 
   const team = await Team.findById(req.session.team._id);
 
-  if (!team) {
-    return next(new HttpError(`Kunde inte hitta användaren för session`, 404));
-  }
+  if (!team) return next(new HttpError(`Ingen matchande användare`, 404));
 
   req.team = team;
+  next();
+});
 
+app.use(async (req, res, next) => {
+  if (!req.session.admin) return next();
+
+  const admin = await Admin.findById(req.session.admin._id);
+
+  if (!admin) return next(new HttpError(`Ingen matchande användare`, 404));
+
+  req.admin = admin;
   next();
 });
 
 app.use('/api/teams', teamRouter);
+app.use('/api/sessions', sessionRouter);
 
 app.use((req, res, next) => {
   throw new HttpError('Sökvägen hittades inte', 404);
