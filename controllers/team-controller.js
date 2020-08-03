@@ -5,33 +5,21 @@ const Team = require('../models/team');
 const { asyncWrapper } = require('../utils/asyncWrapper');
 
 async function create(req, res, next) {
-  const alreadyExists = await Team.findOne({ name: req.body.name });
+  const { name, password } = req.body;
+  const createTeam = new Team(req.body);
 
-  if (alreadyExists) {
-    return next(
-      new HttpError(`Välj ett annat namn, ett lag med namnet ${req.body.name} finns redan.`)
-    );
+  await createTeam.save();
+  const team = await Team.findOne({ name: name });
+
+  if (team && team.comparePasswords(password)) {
+    console.log('team and password is correct');
+    req.session.team = team;
+
+    res.status(200);
+    return res.json({ name: name });
   }
 
-  const hashedPassword = await bcrypt.hash(req.body.password, 12);
-  const createTeam = new Team({ ...req.body, password: hashedPassword });
-  await createTeam.save();
-
-  const team = await Team.findOne({ name: req.body.name });
-
-  console.log('team', team);
-
-  if (!team) return next(new HttpError(`Laget finns inte!`));
-
-  const isPassword = await bcrypt.compare(req.body.password, team.password);
-
-  if (!isPassword) return next(new HttpError(`Ogiltigt lösenord`));
-
-  req.session.isOnline = true;
-  req.session.team = team;
-
-  res.status(200);
-  return res.json({ message: 'Laget är nu skapat och inloggat', name: req.body.nam });
+  return next(new HttpError(`Lag namn eller lösenord är felaktigt!`));
 }
 
 async function setScore(req, res, next) {
