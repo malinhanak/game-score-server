@@ -1,11 +1,11 @@
 const express = require('express');
-const teamController = require('../controllers/team-controller');
+const teamControllers = require('../controllers/team-controllers');
 
 const teamRouter = express.Router();
 
-teamRouter.route('/').get(teamController.getTeams).post(teamController.create);
-teamRouter.route('/get-score/:name').get(teamController.getScore);
+teamRouter.route('/').get(teamControllers.getTeams).post(teamControllers.create);
+teamRouter.route('/get-score/:name').get(teamControllers.getScore);
 
-teamRouter.route('/set-score').patch(teamController.setScore);
+teamRouter.route('/set-score').patch(teamControllers.setScore);
 
 module.exports = teamRouter;
