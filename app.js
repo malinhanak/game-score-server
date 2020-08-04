@@ -28,8 +28,7 @@ const {
 
 const store = new MongoDBStore({
   uri: DB_URI,
-  collection: 'sessions',
-  ttl: parseInt(SESS_LIFETIME) / 1000
+  collection: 'sessions'
 });
 
 app.use(bodyParser.json());
@@ -70,10 +69,12 @@ app.use(async (req, res, next) => {
   if (!team) return next(new HttpError(`Ingen matchande användare`, 404));
 
   req.team = team;
+
   next();
 });
 
 app.use(async (req, res, next) => {
+  console.log(req.session.admin);
   if (!req.session.admin) return next();
 
   const admin = await Admin.findById(req.session.admin._id);
