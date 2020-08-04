@@ -9,11 +9,14 @@ const Team = require('./models/team');
 const Admin = require('./models/admin');
 const teamRouter = require('./routes/team-router');
 const sessionRouter = require('./routes/session-router');
+const adminRouter = require('./routes/admin-router');
+const gameRouter = require('./routes/game-router');
 const db = require('./db');
 
 const app = express();
 
 const {
+  PORT,
   DB_URI,
   SESS_LIFETIME,
   SESS_NAME,
@@ -83,6 +86,8 @@ app.use(async (req, res, next) => {
 
 app.use('/api/teams', teamRouter);
 app.use('/api/sessions', sessionRouter);
+app.use('/api/game', gameRouter);
+app.use('/api/admin', adminRouter);
 
 app.use((req, res, next) => {
   throw new HttpError('Sökvägen hittades inte', 404);
@@ -96,7 +101,7 @@ app.use((error, req, res, next) => {
 
 db.connect()
   .then(() => {
-    app.listen(process.env.PORT || 4000, () => console.info('Applikationen startade'));
+    app.listen(PORT || 4000, () => console.info('Applikationen startade'));
     Admin.countDocuments({}, async (err, count) => {
       if (err) throw new Error(`Fel uppstod i dokument beräknaren: ${err}`);
       if (count === 0) {
