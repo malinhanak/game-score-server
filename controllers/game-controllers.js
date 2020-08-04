@@ -6,6 +6,9 @@ const { asyncWrapper } = require('../utils/asyncWrapper');
 const { createGameArray } = require('../utils/helper');
 
 const create = async (req, res, next) => {
+  if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
+    return next(new HttpError(`Du saknar behörighet`));
+  }
   const { year, games } = req.body;
   const gameArray = createGameArray(games);
   const createGame = new Game({ year: year, games: gameArray });
@@ -16,6 +19,9 @@ const create = async (req, res, next) => {
 };
 
 const remove = async (req, res, next) => {
+  if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
+    return next(new HttpError(`Du saknar behörighet`));
+  }
   const { year } = req.body;
   const game = await Game.findOne({ year: year });
 

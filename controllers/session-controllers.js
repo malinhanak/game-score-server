@@ -13,7 +13,9 @@ const login = async (req, res, next) => {
 
   if (admin && admin.comparePasswords(password)) {
     req.session.admin = admin;
-
+    req.session.save((err) => {
+      if (err) return next(new HttpError('Något gick fel'));
+    });
     res.status(200);
     return res.json({ admin: username });
   }
@@ -26,8 +28,11 @@ const loginTeam = async (req, res, next) => {
   const team = await Team.findOne({ name: name });
 
   if (team && team.comparePasswords(password)) {
+    console.log('team', team);
     req.session.team = team;
-
+    req.session.save((err) => {
+      if (err) return next(new HttpError('Något gick fel'));
+    });
     res.status(200);
     return res.json({ team: name });
   }
@@ -36,11 +41,14 @@ const loginTeam = async (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
+  if (!req.admin || !req.session.admin) {
+    return next(new HttpError(`Du är inte inloggad`));
+  }
   const admin = req.session.admin;
   if (admin) {
     return session.destroy((err) => {
       if (err) return next(new HttpError(`Utloggningen misslyckades`));
-      res.clearCookie(SESS_NAME);
+      // res.clearCookie(SESS_NAME);
       res.status(200);
       return res.json({ message: 'Utloggad', admin: admin.username });
     });
@@ -50,11 +58,14 @@ const logout = async (req, res, next) => {
 };
 
 const logoutTeam = async (req, res, next) => {
+  if (!req.team || !req.session.team) {
+    return next(new HttpError(`Du är inte inloggad`));
+  }
   const team = req.session.team;
   if (team) {
     return session.destroy((err) => {
       if (err) return next(new HttpError(`Utloggningen misslyckades`));
-      res.clearCookie(SESS_NAME);
+      // res.clearCookie(SESS_NAME);
       res.status(200);
       return res.json({ message: 'Utloggad', team: team.name });
     });
