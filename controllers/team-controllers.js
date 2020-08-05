@@ -62,8 +62,8 @@ const setScore = async (req, res, next) => {
   // }
   const { name, game, points } = req.body;
   const score = await Score.findOne({ team: name });
-  console.log('is points', points, points.includes('-'));
-  const isNeg = points.includes('-');
+  const pattern = new RegExp('-');
+  const isNeg = pattern.test(points);
   const parsedPoints = isNeg ? parseInt(points.split('-')[1], 10) : parseInt(points, 10);
 
   if (!score) return next(new HttpError(`Kunde inte hitta laget`));
