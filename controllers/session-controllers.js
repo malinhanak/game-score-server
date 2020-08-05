@@ -27,17 +27,17 @@ const loginTeam = async (req, res, next) => {
   const { name, password } = req.body;
   const team = await Team.findOne({ name: name });
 
-  if (team && team.comparePasswords(password)) {
-    console.log('team', team);
-    req.session.team = team;
-    req.session.save((err) => {
-      if (err) return next(new HttpError('Något gick fel'));
-    });
-    res.status(200);
-    return res.json({ team: name });
+  if (!team && !team.comparePasswords(password)) {
+    return next(new HttpError(`Lagnamn eller lösenord är felaktigt!`));
   }
 
-  return next(new HttpError(`Lagnamn eller lösenord är felaktigt!`));
+  req.session.isOnline = true;
+  req.session.team = team;
+  // req.session.save((err) => {
+  //   if (err) return next(new HttpError('Något gick fel'));
+  // });
+  res.status(200);
+  return res.json({ team: name });
 };
 
 const logout = async (req, res, next) => {

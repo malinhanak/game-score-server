@@ -57,7 +57,7 @@ app.use(
 
 app.use(async (req, res, next) => {
   if (!req.session.team) return next();
-
+  console.log(req.session.team);
   const team = await Team.findById(req.session.team._id);
 
   if (!team) return next(new HttpError(`Ingen matchande användare`, 404));
