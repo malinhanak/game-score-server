@@ -86,8 +86,8 @@ const getScore = async (req, res, next) => {
   if (!req.team || !req.team.name !== req.body.name) {
     return next(new HttpError(`Du saknar behörighet`));
   }
-  const { name } = req.body;
-  const team = await Score.findOne({ team: name });
+  const team = req.params.team;
+  const team = await Score.findOne({ team: team });
 
   if (!team) {
     return next(new HttpError(`Hittar inga lag`));

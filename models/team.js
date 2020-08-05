@@ -14,6 +14,7 @@ const TeamSchema = new Schema({
       message: 'Teamet existerar redan!'
     }
   },
+  slug: String,
   password: { type: String, required: true },
   members: [String]
 });
