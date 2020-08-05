@@ -15,7 +15,7 @@ const gameRouter = require('./routes/game-router');
 const db = require('./db');
 const { PORT, DB_URI, SESS_NAME, SESS_SECRET, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
 corsOptions = {
-  origin: ['https://my-game-kamp.web.app/', 'http://localhost:3000', 'http://localhost:3001/'],
+  origin: ['https://my-game-kamp.web.app/', 'http://localhost:3000', 'http://localhost:3001'],
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true
