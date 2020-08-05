@@ -5,7 +5,7 @@ const Team = require('../models/team');
 const Game = require('../models/game');
 const Score = require('../models/score');
 const { asyncWrapper } = require('../utils/asyncWrapper');
-const { createScoreObject, createMemberArray } = require('../utils/helpers');
+const { createScoreObject, createMemberArray, mixedFieldCalc } = require('../utils/helpers');
 
 const create = async (req, res, next) => {
   if (!req.admin || !req.admin.role.includes('ADMIN')) {
@@ -62,23 +62,24 @@ const setScore = async (req, res, next) => {
   }
   const { name, game, points } = req.body;
   const score = await Score.findOne({ team: name });
-  const parsedPoints = parseInt(points, 10);
+  const isNeg = points.includes('-');
+  const parsedPoints = isNeg ? parseInt(points.split('-')[1], 10) : parseInt(points, 10);
 
-  if (score) {
-    score.scores = { ...score.scores, [game]: parsedPoints };
-    score.markModified('scores');
-    await score.save();
+  if (!score) return next(new HttpError(`Kunde inte hitta laget`));
 
-    const newScore = parseInt(score.scoreTotal, 10) + parsedPoints;
-    await Score.updateOne({ team: name }, { scoreTotal: newScore });
+  const data = {
+    scoreTotal: mixedFieldCalc(isNeg, score.scoreTotal, parsedPoints),
+    scores: { ...score.scores, [game]: mixedFieldCalc(isNeg, score.scores[game], parsedPoints) }
+  };
 
-    res.status(200);
-    return res.json({
-      message: `${points} poäng lades till lag ${name} total poäng och för grenen ${game}.`
-    });
-  }
+  await Score.updateOne({ team: name }, data);
 
-  return next(new HttpError(`Kunde inte hitta laget`));
+  res.status(200);
+  return res.json({
+    message: `${points} ${
+      isNeg ? 'subtraherades från' : 'poäng lades'
+    } till lag ${name} total poäng och för grenen ${game}.`
+  });
 };
 
 const getScore = async (req, res, next) => {
@@ -88,12 +89,12 @@ const getScore = async (req, res, next) => {
   const { name } = req.body;
   const team = await Score.findOne({ team: name });
 
-  if (team) {
-    res.status(200);
-    return res.json({ score: team.scoreTotal });
+  if (!team) {
+    return next(new HttpError(`Hittar inga lag`));
   }
 
-  return next(new HttpError(`Hittar inga lag`));
+  res.status(200);
+  return res.json({ score: team.scoreTotal });
 };
 
 const getAllScores = async (req, res, next) => {
