@@ -57,9 +57,9 @@ const createScore = async (req, res, next) => {
 };
 
 const setScore = async (req, res, next) => {
-  if (!req.team || req.team.name !== req.body.name) {
-    return next(new HttpError(`Du saknar behörighet`));
-  }
+  // if (!req.team || req.team.name !== req.body.name) {
+  //   return next(new HttpError(`Du saknar behörighet`));
+  // }
   const { name, game, points } = req.body;
   const score = await Score.findOne({ team: name });
   const isNeg = points.includes('-');
@@ -84,6 +84,7 @@ const setScore = async (req, res, next) => {
 
 const getScore = async (req, res, next) => {
   const name = req.params.team;
+  console.log('name', name);
   const team = await Score.findOne({ slug: name });
 
   if (!team) {
