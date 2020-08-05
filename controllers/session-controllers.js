@@ -14,9 +14,9 @@ const login = async (req, res, next) => {
     return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
   req.session.admin = sessionizeUser(admin);
-  // req.session.save((err) => {
-  //   if (err) return next(new HttpError('Något gick fel'));
-  // });
+  req.session.save((err) => {
+    if (err) return next(new HttpError('Något gick fel'));
+  });
   res.status(200);
   return res.json({ admin: username });
 };
@@ -30,45 +30,55 @@ const loginTeam = async (req, res, next) => {
   }
 
   req.session.team = sessionizeUser(team);
-  // req.session.save((err) => {
-  //   if (err) return next(new HttpError('Något gick fel'));
-  // });
+  req.session.save((err) => {
+    if (err) return next(new HttpError('Något gick fel'));
+  });
   res.status(200);
   return res.json({ team: name });
 };
 
 const logout = async (req, res, next) => {
-  if (!req.admin || !req.session.admin) {
-    return next(new HttpError(`Du är inte inloggad`));
-  }
-  const admin = req.session.admin;
-  if (admin) {
-    return session.destroy((err) => {
-      if (err) return next(new HttpError(`Utloggningen misslyckades`));
-      res.clearCookie(SESS_NAME);
-      res.status(200);
-      return res.json({ message: 'Utloggad', admin: admin.username });
-    });
+  if (!req.session.admin) {
+    return next(new HttpError(`Du verkar inte ha någon aktiv inloggning som admin`));
   }
 
-  return next(new HttpError(`Du verkar inte ha någon aktiv admin session`));
+  if (req.session.team && req.session.admin) {
+    req.session.admin = null;
+    req.session.save((err) => {
+      if (err) return next(new HttpError('Något gick fel'));
+    });
+    res.status(200);
+    return res.json({ message: 'Admin utloggad' });
+  }
+
+  return req.session.destroy((err) => {
+    if (err) return next(new HttpError(`Utloggningen misslyckades`));
+    res.clearCookie(SESS_NAME);
+    res.status(200);
+    return res.json({ message: 'Utloggad' });
+  });
 };
 
 const logoutTeam = async (req, res, next) => {
-  if (!req.team || !req.session.team) {
-    return next(new HttpError(`Du är inte inloggad`));
-  }
-  const team = req.session.team;
-  if (team) {
-    return session.destroy((err) => {
-      if (err) return next(new HttpError(`Utloggningen misslyckades`));
-      res.clearCookie(SESS_NAME);
-      res.status(200);
-      return res.json({ message: 'Utloggad', team: team.name });
-    });
+  if (!req.session.team) {
+    return next(new HttpError(`Du verkar inte ha någon aktiv team inloggning`));
   }
 
-  return next(new HttpError(`Du verkar inte ha någon aktiv admin session`));
+  if (req.session.admin && req.session.team) {
+    req.session.team = null;
+    req.session.save((err) => {
+      if (err) return next(new HttpError('Något gick fel'));
+    });
+    res.status(200);
+    return res.json({ message: 'Team utloggad' });
+  }
+
+  return req.session.destroy((err) => {
+    if (err) return next(new HttpError(`Utloggningen misslyckades`));
+    res.clearCookie(SESS_NAME);
+    res.status(200);
+    return res.json({ message: 'Utloggad' });
+  });
 };
 
 exports.login = asyncWrapper(login);
