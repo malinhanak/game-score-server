@@ -10,3 +10,7 @@ exports.createScoreObject = (games) => {
 exports.createMemberArray = (members) => {
   return members.replace(/, /g, ',').split(',');
 };
+
+exports.sessionizeUser = (user) => {
+  return { id: user._id, username: user.name };
+};

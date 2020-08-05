@@ -8,7 +8,7 @@ const { asyncWrapper } = require('../utils/asyncWrapper');
 const { createScoreObject, createMemberArray } = require('../utils/helper');
 
 const create = async (req, res, next) => {
-  if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
+  if (!req.admin || !req.admin.role.includes('ADMIN')) {
     return next(new HttpError(`Du saknar behörighet`));
   }
   const { year, name, password, team } = req.body;
@@ -36,7 +36,7 @@ const create = async (req, res, next) => {
 };
 
 const createScore = async (req, res, next) => {
-  if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
+  if (!req.admin || !req.admin.role.includes('ADMIN')) {
     return next(new HttpError(`Du saknar behörighet`));
   }
   const { name, year } = req.body;
@@ -58,7 +58,7 @@ const createScore = async (req, res, next) => {
 };
 
 const setScore = async (req, res, next) => {
-  if (!req.team || !req.session.team.name !== req.team.name) {
+  if (!req.team || req.team.name !== req.body.name) {
     return next(new HttpError(`Du saknar behörighet`));
   }
   const { name, game, points } = req.body;
@@ -83,7 +83,7 @@ const setScore = async (req, res, next) => {
 };
 
 const getScore = async (req, res, next) => {
-  if (!req.team || !req.session.team.name !== req.team.name) {
+  if (!req.team || !req.team.name !== req.body.name) {
     return next(new HttpError(`Du saknar behörighet`));
   }
   const { name } = req.body;
@@ -98,7 +98,6 @@ const getScore = async (req, res, next) => {
 };
 
 const getAllScores = async (req, res, next) => {
-  console.log('sess', req.team);
   const scores = await Score.find({});
 
   if (scores) {

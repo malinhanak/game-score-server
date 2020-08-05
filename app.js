@@ -15,16 +15,7 @@ const db = require('./db');
 
 const app = express();
 
-const {
-  PORT,
-  DB_URI,
-  SESS_LIFETIME,
-  SESS_NAME,
-  SESS_SECRET,
-  ADMIN_EMAIL,
-  ADMIN_NAME,
-  ADMIN_PASS
-} = process.env;
+const { PORT, DB_URI, SESS_NAME, SESS_SECRET, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
 
 const store = new MongoDBStore({
   uri: DB_URI,
@@ -53,25 +44,24 @@ app.use(
 
 app.use(async (req, res, next) => {
   if (!req.session.team) return next();
-  console.log(req.session.team);
-  const team = await Team.findById(req.session.team._id);
+  const team = await Team.findById(req.session.team.id);
 
   if (!team) return next(new HttpError(`Ingen matchande användare`, 404));
 
-  req.team = team;
+  req.team = team ? team : null;
 
   next();
 });
 
 app.use(async (req, res, next) => {
-  console.log(req.session.admin);
   if (!req.session.admin) return next();
+  console.log(req.session.admin);
 
-  const admin = await Admin.findById(req.session.admin._id);
+  const admin = await Admin.findById(req.session.admin.id);
 
   if (!admin) return next(new HttpError(`Ingen matchande användare`, 404));
 
-  req.admin = admin;
+  req.admin = admin ? admin : null;
   next();
 });
 

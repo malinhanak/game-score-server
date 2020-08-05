@@ -1,9 +1,8 @@
-const bcrypt = require('bcryptjs');
-
 const HttpError = require('../models/errors/HttpError');
 const Team = require('../models/team');
 const Admin = require('../models/admin');
 const { asyncWrapper } = require('../utils/asyncWrapper');
+const { sessionizeUser } = require('../utils/helper');
 
 const { SESS_NAME } = process.env;
 
@@ -11,16 +10,16 @@ const login = async (req, res, next) => {
   const { username, password } = req.body;
   const admin = await Admin.findOne({ username: username });
 
-  if (admin && admin.comparePasswords(password)) {
-    req.session.admin = admin;
-    req.session.save((err) => {
-      if (err) return next(new HttpError('Något gick fel'));
-    });
-    res.status(200);
-    return res.json({ admin: username });
+  if (!admin && !admin.comparePasswords(password)) {
+    return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
-
-  return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
+  req.session.isOnline = true;
+  req.session.admin = admin;
+  req.session.save((err) => {
+    if (err) return next(new HttpError('Något gick fel'));
+  });
+  res.status(200);
+  return res.json({ admin: username });
 };
 
 const loginTeam = async (req, res, next) => {
@@ -31,8 +30,7 @@ const loginTeam = async (req, res, next) => {
     return next(new HttpError(`Lagnamn eller lösenord är felaktigt!`));
   }
 
-  req.session.isOnline = true;
-  req.session.team = team;
+  req.session.team = sessionizeUser(team);
   // req.session.save((err) => {
   //   if (err) return next(new HttpError('Något gick fel'));
   // });
@@ -48,7 +46,7 @@ const logout = async (req, res, next) => {
   if (admin) {
     return session.destroy((err) => {
       if (err) return next(new HttpError(`Utloggningen misslyckades`));
-      // res.clearCookie(SESS_NAME);
+      res.clearCookie(SESS_NAME);
       res.status(200);
       return res.json({ message: 'Utloggad', admin: admin.username });
     });
@@ -65,7 +63,7 @@ const logoutTeam = async (req, res, next) => {
   if (team) {
     return session.destroy((err) => {
       if (err) return next(new HttpError(`Utloggningen misslyckades`));
-      // res.clearCookie(SESS_NAME);
+      res.clearCookie(SESS_NAME);
       res.status(200);
       return res.json({ message: 'Utloggad', team: team.name });
     });
