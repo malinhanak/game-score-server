@@ -14,3 +14,8 @@ exports.createMemberArray = (members) => {
 exports.sessionizeUser = (user) => {
   return { id: user._id, username: user.name };
 };
+
+exports.mixedFieldCalc = (value, current, points) => {
+  if (value) return current - points;
+  return current + points;
+};
