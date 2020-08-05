@@ -71,7 +71,7 @@ app.use(async (req, res, next) => {
   req.admin = admin ? admin : null;
   next();
 });
-
+app.options('*', cors(corsOptions));
 app.use('/api/teams', teamRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/api/game', gameRouter);
