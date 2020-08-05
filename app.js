@@ -82,8 +82,10 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  console.log('ERROR', error);
   return (
-    res.status(error.code).json({ message: error.message, error: error.errors }) || res.status(500)
+    res.status(error.code).json({ message: error.message, error: error.errors }) ||
+    res.status(500).res.json({ message: 'Något gick fel' })
   );
 });
 
