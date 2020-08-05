@@ -5,7 +5,7 @@ const Team = require('../models/team');
 const Game = require('../models/game');
 const Score = require('../models/score');
 const { asyncWrapper } = require('../utils/asyncWrapper');
-const { createScoreObject, createMemberArray } = require('../utils/helper');
+const { createScoreObject, createMemberArray } = require('../utils/helpers');
 
 const create = async (req, res, next) => {
   if (!req.admin || !req.admin.role.includes('ADMIN')) {

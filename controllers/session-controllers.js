@@ -2,7 +2,7 @@ const HttpError = require('../models/errors/HttpError');
 const Team = require('../models/team');
 const Admin = require('../models/admin');
 const { asyncWrapper } = require('../utils/asyncWrapper');
-const { sessionizeUser } = require('../utils/helper');
+const { sessionizeUser } = require('../utils/helpers');
 
 const { SESS_NAME } = process.env;
 

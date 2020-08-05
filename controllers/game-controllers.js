@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const HttpError = require('../models/errors/HttpError');
 const Game = require('../models/game');
 const { asyncWrapper } = require('../utils/asyncWrapper');
-const { createGameArray } = require('../utils/helper');
+const { createGameArray } = require('../utils/helpers');
 
 const create = async (req, res, next) => {
   if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
