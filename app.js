@@ -55,7 +55,6 @@ app.use(async (req, res, next) => {
 
 app.use(async (req, res, next) => {
   if (!req.session.admin) return next();
-  console.log(req.session.admin);
 
   const admin = await Admin.findById(req.session.admin.id);
 

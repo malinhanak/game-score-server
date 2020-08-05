@@ -13,11 +13,10 @@ const login = async (req, res, next) => {
   if (!admin && !admin.comparePasswords(password)) {
     return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
-  req.session.isOnline = true;
-  req.session.admin = admin;
-  req.session.save((err) => {
-    if (err) return next(new HttpError('Något gick fel'));
-  });
+  req.session.admin = sessionizeUser(admin);
+  // req.session.save((err) => {
+  //   if (err) return next(new HttpError('Något gick fel'));
+  // });
   res.status(200);
   return res.json({ admin: username });
 };

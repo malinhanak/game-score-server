@@ -24,7 +24,6 @@ const create = async (req, res, next) => {
 
   // Create the initial score for the team
   const game = await Game.find({ year: year });
-  console.log(game);
   if (game.length < 1) return next(new HttpError(`Laget skapades, men kunde inte skapa poäng`));
 
   const initialScore = await createScoreObject(game[0].games);
