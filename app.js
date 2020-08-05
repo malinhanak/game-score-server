@@ -47,11 +47,7 @@ app.use(
     secret: SESS_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: store,
-    cookie: {
-      sameSite: true,
-      maxAge: parseInt(SESS_LIFETIME)
-    }
+    store: store
   })
 );
 
