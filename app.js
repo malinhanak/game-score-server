@@ -1,9 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const session = require('express-session');
 const cors = require('cors');
-const MongoDBStore = require('connect-mongodb-session')(session);
 
 const HttpError = require('./models/errors/HttpError');
 const Team = require('./models/team');
@@ -13,7 +11,8 @@ const sessionRouter = require('./routes/session-router');
 const adminRouter = require('./routes/admin-router');
 const gameRouter = require('./routes/game-router');
 const db = require('./db');
-const { PORT, DB_URI, SESS_NAME, SESS_SECRET, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
+const { PORT, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
+
 const corsOptions = {
   origin: ['https://my-game-kamp.web.app/', 'http://localhost:3000', 'http://localhost:3001'],
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
@@ -22,46 +21,9 @@ const corsOptions = {
 };
 
 const app = express();
-const store = new MongoDBStore({ uri: DB_URI, collection: 'sessions' });
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-
-app.use(
-  session({
-    name: SESS_NAME,
-    secret: SESS_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: store,
-    cookie: {
-      domain: 'http://localhost:3001',
-      sameSite: true
-    }
-  })
-);
-
-app.use(async (req, res, next) => {
-  if (!req.session.team) return next();
-  const team = await Team.findById(req.session.team.id);
-
-  if (!team) return next(new HttpError(`Ingen matchande användare`, 404));
-
-  req.team = team ? team : null;
-
-  next();
-});
-
-app.use(async (req, res, next) => {
-  if (!req.session.admin) return next();
-
-  const admin = await Admin.findById(req.session.admin.id);
-
-  if (!admin) return next(new HttpError(`Ingen matchande användare`, 404));
-
-  req.admin = admin ? admin : null;
-  next();
-});
 
 app.options('*', cors(corsOptions));
 app.use('/api/teams', teamRouter);
