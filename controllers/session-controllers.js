@@ -13,12 +13,13 @@ const login = async (req, res, next) => {
   if (!admin && !admin.comparePasswords(password)) {
     return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
-  req.session.admin = sessionizeUser(admin);
+  const sessionUser = await sessionizeUser(admin);
+  req.session.admin = sessionUser;
   req.session.save((err) => {
     if (err) return next(new HttpError('Något gick fel'));
   });
   res.status(200);
-  return res.json({ admin: username });
+  return res.json(sessionUser);
 };
 
 const loginTeam = async (req, res, next) => {
@@ -28,13 +29,13 @@ const loginTeam = async (req, res, next) => {
   if (!team && !team.comparePasswords(password)) {
     return next(new HttpError(`Lagnamn eller lösenord är felaktigt!`));
   }
-
-  req.session.team = sessionizeUser(team);
+  const sessionUser = await sessionizeUser(team);
+  req.session.team = sessionUser;
   req.session.save((err) => {
     if (err) return next(new HttpError('Något gick fel'));
   });
   res.status(200);
-  return res.json({ team: name });
+  return res.json(sessionUser);
 };
 
 const logout = async (req, res, next) => {

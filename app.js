@@ -14,7 +14,7 @@ const adminRouter = require('./routes/admin-router');
 const gameRouter = require('./routes/game-router');
 const db = require('./db');
 const { PORT, DB_URI, SESS_NAME, SESS_SECRET, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
-corsOptions = {
+const corsOptions = {
   origin: ['https://my-game-kamp.web.app/', 'http://localhost:3000', 'http://localhost:3001'],
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
@@ -22,23 +22,10 @@ corsOptions = {
 };
 
 const app = express();
+const store = new MongoDBStore({ uri: DB_URI, collection: 'sessions' });
 
 app.use(cors(corsOptions));
-
-const store = new MongoDBStore({
-  uri: DB_URI,
-  collection: 'sessions'
-});
-
 app.use(bodyParser.json());
-
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-//   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//   res.setHeader('Access-Control-Allow-Credentials', true);
-//   next();
-// });
 
 app.use(
   session({
@@ -46,7 +33,11 @@ app.use(
     secret: SESS_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: store
+    store: store,
+    cookie: {
+      domain: 'http://localhost:3001',
+      sameSite: true
+    }
   })
 );
 
@@ -71,6 +62,7 @@ app.use(async (req, res, next) => {
   req.admin = admin ? admin : null;
   next();
 });
+
 app.options('*', cors(corsOptions));
 app.use('/api/teams', teamRouter);
 app.use('/api/sessions', sessionRouter);
