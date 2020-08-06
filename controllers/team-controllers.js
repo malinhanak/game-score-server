@@ -8,9 +8,6 @@ const { asyncWrapper } = require('../utils/asyncWrapper');
 const { createScoreObject, createMemberArray, mixedFieldCalc } = require('../utils/helpers');
 
 const create = async (req, res, next) => {
-  if (!req.admin || !req.admin.role.includes('ADMIN')) {
-    return next(new HttpError(`Du saknar behörighet`));
-  }
   const { year, name, password, team } = req.body;
   const members = await createMemberArray(team);
 
@@ -35,9 +32,6 @@ const create = async (req, res, next) => {
 };
 
 const createScore = async (req, res, next) => {
-  if (!req.admin || !req.admin.role.includes('ADMIN')) {
-    return next(new HttpError(`Du saknar behörighet`));
-  }
   const { name, year } = req.body;
 
   const team = await Team.findOne({ name: name });
@@ -57,9 +51,7 @@ const createScore = async (req, res, next) => {
 };
 
 const setScore = async (req, res, next) => {
-  // if (!req.team || req.team.name !== req.body.name) {
-  //   return next(new HttpError(`Du saknar behörighet`));
-  // }
+  console.log('Reached the controllr');
   const { name, game, points } = req.body;
   const score = await Score.findOne({ team: name });
   const pattern = new RegExp('-');
@@ -84,9 +76,8 @@ const setScore = async (req, res, next) => {
 };
 
 const getScore = async (req, res, next) => {
-  const name = req.params.team;
-  console.log('name', name);
-  const team = await Score.findOne({ slug: name });
+  const name = req.user.name;
+  const team = await Score.findOne({ team: name });
 
   if (!team) {
     return next(new HttpError(`Hittar inga lag`));

@@ -1,10 +1,12 @@
+const jwt = require('jsonwebtoken');
+
 const HttpError = require('../models/errors/HttpError');
 const Team = require('../models/team');
 const Admin = require('../models/admin');
 const { asyncWrapper } = require('../utils/asyncWrapper');
 const { sessionizeUser } = require('../utils/helpers');
 
-const { SESS_NAME } = process.env;
+const { SECRET_KEY } = process.env;
 
 const login = async (req, res, next) => {
   const { username, password } = req.body;
@@ -14,72 +16,33 @@ const login = async (req, res, next) => {
     return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
   const sessionUser = await sessionizeUser(admin);
-  req.session.admin = sessionUser;
-  req.session.save((err) => {
-    if (err) return next(new HttpError('Något gick fel'));
-  });
+  const token = jwt.sign({ ...sessionUser }, SECRET_KEY, { expiresIn: '8h' });
   res.status(200);
-  return res.json(sessionUser);
+  return res.json({ ...sessionUser, token: token });
 };
 
 const loginTeam = async (req, res, next) => {
   const { name, password } = req.body;
   const team = await Team.findOne({ name: name });
-
+  console.log('password', password);
   if (!team && !team.comparePasswords(password)) {
     return next(new HttpError(`Lagnamn eller lösenord är felaktigt!`));
   }
+
   const sessionUser = await sessionizeUser(team);
-  req.session.team = sessionUser;
-  req.session.save((err) => {
-    if (err) return next(new HttpError('Något gick fel'));
-  });
+  const token = jwt.sign({ ...sessionUser }, SECRET_KEY, { expiresIn: '8h' });
   res.status(200);
-  return res.json(sessionUser);
+  return res.json({ ...sessionUser, token: token });
 };
 
 const logout = async (req, res, next) => {
-  if (!req.session.admin) {
-    return next(new HttpError(`Du verkar inte ha någon aktiv inloggning som admin`));
-  }
-
-  if (req.session.team && req.session.admin) {
-    req.session.admin = null;
-    req.session.save((err) => {
-      if (err) return next(new HttpError('Något gick fel'));
-    });
-    res.status(200);
-    return res.json({ message: 'Admin utloggad' });
-  }
-
-  return req.session.destroy((err) => {
-    if (err) return next(new HttpError(`Utloggningen misslyckades`));
-    res.clearCookie(SESS_NAME);
-    res.status(200);
-    return res.json({ message: 'Utloggad' });
-  });
+  res.status(200);
+  return res.json({ message: 'Utloggad' });
 };
 
 const logoutTeam = async (req, res, next) => {
-  if (!req.session.team) {
-    return next(new HttpError(`Du verkar inte ha någon aktiv team inloggning`));
-  }
-
-  if (req.session.admin && req.session.team) {
-    req.session.team = null;
-    req.session.save((err) => {
-      if (err) return next(new HttpError('Något gick fel'));
-    });
-    res.status(200);
-    return res.json({ message: 'Team utloggad' });
-  }
-
-  return req.session.destroy((err) => {
-    if (err) return next(new HttpError(`Utloggningen misslyckades`));
-    res.clearCookie(SESS_NAME);
-    res.status(200);
-    return res.json({ message: 'Utloggad' });
-  });
+  res.status(200);
+  return res.json({ message: 'Utloggad' });
 };
 
 exports.login = asyncWrapper(login);
