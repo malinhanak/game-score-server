@@ -31,7 +31,6 @@ TeamSchema.statics.doesNotExist = async function (field) {
 };
 
 TeamSchema.methods.comparePasswords = async function (password) {
-  console.log('password', password);
   return await bcrypt.compare(password, this.password);
 };
 const Team = mongoose.models.Team || mongoose.model('Team', TeamSchema);
