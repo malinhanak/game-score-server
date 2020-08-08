@@ -5,6 +5,15 @@ const Game = require('../models/game');
 const { asyncWrapper } = require('../utils/asyncWrapper');
 const { createGameArray } = require('../utils/helpers');
 
+const getGames = async (req, res, next) => {
+  const year = req.params.year;
+  const game = await Game.findOne({ year: year });
+  if (!game) return next(new HttpError(`Finns inga spel för ${year}`));
+
+  res.status(200);
+  return res.json(game.games);
+};
+
 const create = async (req, res, next) => {
   if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
     return next(new HttpError(`Du saknar behörighet`));
@@ -37,3 +46,4 @@ const remove = async (req, res, next) => {
 
 exports.create = asyncWrapper(create);
 exports.remove = asyncWrapper(remove);
+exports.getGames = asyncWrapper(getGames);
