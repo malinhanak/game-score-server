@@ -3,6 +3,8 @@ const gameControllers = require('../controllers/game-controllers');
 
 const gameRouter = express.Router();
 
-gameRouter.route('/').post(gameControllers.create).delete(gameControllers.remove);
+gameRouter.post('/', gameControllers.create);
+gameRouter.delete('/', gameControllers.remove);
+gameRouter.get('/:year', gameControllers.getGames);
 
 module.exports = gameRouter;
