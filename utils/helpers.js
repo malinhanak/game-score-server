@@ -1,7 +1,11 @@
 const bcrypt = require('bcryptjs');
 
 exports.createGameArray = (games) => {
-  return games.replace(/\s+/g, '').replace(/[ä]/g, 'a').replace(/[ö]/g, 'o').split(',');
+  return games
+    .replace(/\s+/g, '')
+    .replace(/[ä]/g, 'a')
+    .replace(/[ö]/g, 'o')
+    .split(',');
 };
 
 exports.createScoreObject = (games) => {
@@ -25,4 +29,16 @@ exports.mixedFieldCalc = (value, current, points) => {
 exports.comparePasswords = async (password, encryptedPass) => {
   console.log('password', password);
   return await bcrypt.compare(password, encryptedPass);
+};
+
+exports.createSlug = (name) => {
+  return name
+    ? name
+        .trim()
+        .replace(/[äåáà]/gim, 'a')
+        .replace(/[ööôóò]/gim, 'o')
+        .replace(/[èé]/gim, 'e')
+        .replace(/\s/g, '-')
+        .toLowerCase()
+    : null;
 };

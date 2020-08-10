@@ -6,7 +6,8 @@ const Schema = mongoose.Schema;
 const ScoreSchema = new Schema({
   team: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   scoreTotal: { type: Number },
   scores: { type: mongoose.Mixed }

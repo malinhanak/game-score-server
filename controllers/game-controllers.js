@@ -2,8 +2,9 @@ const bcrypt = require('bcryptjs');
 
 const HttpError = require('../models/errors/HttpError');
 const Game = require('../models/game');
+const Rule = require('../models/rule');
 const { asyncWrapper } = require('../utils/asyncWrapper');
-const { createGameArray } = require('../utils/helpers');
+const { createGameArray, createSlug } = require('../utils/helpers');
 
 const getGames = async (req, res, next) => {
   const year = req.params.year;
@@ -44,6 +45,28 @@ const remove = async (req, res, next) => {
   return next(new HttpError(`Finns inga spel registrerade för ${year}`));
 };
 
+const createRules = async (req, res, next) => {
+  const { name } = req.body;
+  const createRule = new Rule({ ...req.body, slug: createSlug(name) });
+  await createRule.save();
+
+  res.status(200);
+  return res.json({ message: `Regler skapades för spelet ${name}` });
+};
+
+const getRule = async (req, res, next) => {
+  const { slug } = req.params;
+  console.log('SLUG', slug);
+  const game = await Rule.findOne({ slug: slug });
+
+  if (!game) return next(new HttpError('Hittade ingen regel', 404));
+
+  res.status(200);
+  return res.json({ rules: game.rules });
+};
+
 exports.create = asyncWrapper(create);
 exports.remove = asyncWrapper(remove);
 exports.getGames = asyncWrapper(getGames);
+exports.createRules = asyncWrapper(createRules);
+exports.getRule = asyncWrapper(getRule);
