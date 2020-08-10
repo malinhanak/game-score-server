@@ -18,7 +18,11 @@ exports.createMemberArray = (members) => {
 };
 
 exports.sessionizeUser = (user) => {
-  return { id: user._id, name: user.username ?? user?.name, role: user?.role };
+  return {
+    id: user._id,
+    name: user.username ? user.username : user.name ? user.name : null,
+    role: user?.role
+  };
 };
 
 exports.mixedFieldCalc = (value, current, points) => {
