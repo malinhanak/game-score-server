@@ -21,7 +21,7 @@ exports.sessionizeUser = (user) => {
   return {
     id: user._id,
     name: user.username ? user.username : user.name ? user.name : null,
-    role: user?.role
+    role: user.role ? user.role : null
   };
 };
 
