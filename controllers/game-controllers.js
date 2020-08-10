@@ -56,7 +56,6 @@ const createRules = async (req, res, next) => {
 
 const getRule = async (req, res, next) => {
   const { slug } = req.params;
-  console.log('SLUG', slug);
   const game = await Rule.findOne({ slug: slug });
 
   if (!game) return next(new HttpError('Hittade ingen regel', 404));
@@ -65,8 +64,22 @@ const getRule = async (req, res, next) => {
   return res.json({ rules: game.rules });
 };
 
+const updateRule = async (req, res, next) => {
+  const { slug } = req.params;
+  const { rules } = req.body;
+  const game = await Rule.findOne({ slug: slug });
+  if (!game)
+    return next(new HttpError('Hittade ingen regel, försök skapa regler', 404));
+
+  await Rule.updateOne({ slug: slug }, { rules: rules });
+
+  res.status(200);
+  return res.json({ message: `${game.name}'s regler har blivit uppdaterade` });
+};
+
 exports.create = asyncWrapper(create);
 exports.remove = asyncWrapper(remove);
 exports.getGames = asyncWrapper(getGames);
 exports.createRules = asyncWrapper(createRules);
 exports.getRule = asyncWrapper(getRule);
+exports.updateRule = asyncWrapper(updateRule);
