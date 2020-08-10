@@ -14,9 +14,15 @@ const db = require('./db');
 const { PORT, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASS } = process.env;
 
 const corsOptions = {
-  origin: ['https://my-game-kamp.web.app/', 'http://localhost:3000', 'http://localhost:3001'],
+  origin: ['https://my-game-kamp.web.app', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'Authorization'
+  ],
   credentials: true
 };
 
@@ -39,7 +45,9 @@ app.use((error, req, res, next) => {
   console.log('ERROR', error);
 
   return (
-    res.status(error.code).json({ message: error.message, error: error.errors }) ||
+    res
+      .status(error.code)
+      .json({ message: error.message, error: error.errors }) ||
     res.status(500).res.json({ message: 'Något gick fel' })
   );
 });
