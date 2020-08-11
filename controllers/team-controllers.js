@@ -5,7 +5,11 @@ const Team = require('../models/team');
 const Game = require('../models/game');
 const Score = require('../models/score');
 const { asyncWrapper } = require('../utils/asyncWrapper');
-const { createScoreObject, createMemberArray, mixedFieldCalc } = require('../utils/helpers');
+const {
+  createScoreObject,
+  createMemberArray,
+  mixedFieldCalc
+} = require('../utils/helpers');
 
 const create = async (req, res, next) => {
   const { year, name, password, team } = req.body;
@@ -21,10 +25,15 @@ const create = async (req, res, next) => {
 
   // Create the initial score for the team
   const game = await Game.find({ year: year });
-  if (game.length < 1) return next(new HttpError(`Laget skapades, men kunde inte skapa poäng`));
+  if (game.length < 1)
+    return next(new HttpError(`Laget skapades, men kunde inte skapa poäng`));
 
   const initialScore = await createScoreObject(game[0].games);
-  const createScore = new Score({ team: name, scoreTotal: 0, scores: initialScore });
+  const createScore = new Score({
+    team: name,
+    scoreTotal: 0,
+    scores: initialScore
+  });
   await createScore.save();
 
   res.status(200);
@@ -35,34 +44,45 @@ const createScore = async (req, res, next) => {
   const { name, year } = req.body;
 
   const team = await Team.findOne({ name: name });
-  if (!team) return next(new HttpError(`Det finns inget team, skapa team först.`));
+  if (!team)
+    return next(new HttpError(`Det finns inget team, skapa team först.`));
 
   const game = await Game.findOne({ year: year });
   if (game) {
     const initialScore = createScoreObject(game.games);
-    const createScore = new Score({ team: name, scoreTotal: 0, scores: initialScore });
+    const createScore = new Score({
+      team: name,
+      scoreTotal: 0,
+      scores: initialScore
+    });
     await createScore.save();
 
     res.status(200);
     return res.json({ message: `Lag ${name} grund poäng skapades` });
   }
 
-  return next(new HttpError(`Hittar inte ett spel för år ${year}, skapa ett spel först.`));
+  return next(
+    new HttpError(`Hittar inte ett spel för år ${year}, skapa ett spel först.`)
+  );
 };
 
 const setScore = async (req, res, next) => {
-  console.log('Reached the controllr');
   const { name, game, points } = req.body;
   const score = await Score.findOne({ team: name });
   const pattern = new RegExp('-');
   const isNeg = pattern.test(points);
-  const parsedPoints = isNeg ? parseInt(points.split('-')[1], 10) : parseInt(points, 10);
+  const parsedPoints = isNeg
+    ? parseInt(points.split('-')[1], 10)
+    : parseInt(points, 10);
 
   if (!score) return next(new HttpError(`Kunde inte hitta laget`));
 
   const data = {
     scoreTotal: mixedFieldCalc(isNeg, score.scoreTotal, parsedPoints),
-    scores: { ...score.scores, [game]: mixedFieldCalc(isNeg, score.scores[game], parsedPoints) }
+    scores: {
+      ...score.scores,
+      [game]: mixedFieldCalc(isNeg, score.scores[game], parsedPoints)
+    }
   };
 
   await Score.updateOne({ team: name }, data);
@@ -92,7 +112,9 @@ const getAllScores = async (req, res, next) => {
 
   if (scores) {
     res.status(200);
-    return res.json({ scores: scores.map((score) => score.toObject({ getters: true })) });
+    return res.json({
+      scores: scores.map((score) => score.toObject({ getters: true }))
+    });
   }
 
   return next(new HttpError(`Inga poängställningar hittades`));

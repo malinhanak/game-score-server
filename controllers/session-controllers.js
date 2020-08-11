@@ -22,7 +22,7 @@ const login = async (req, res, next) => {
 };
 
 const loginTeam = async (req, res, next) => {
-  const { name, password } = req.body.credentials;
+  const { name, password } = req.body;
   const team = await Team.findOne({ name: name });
   if (!team && !team.comparePasswords(password)) {
     return next(new HttpError(`Lagnamn eller lösenord är felaktigt!`));
