@@ -16,7 +16,7 @@ const login = async (req, res, next) => {
     return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
   const sessionUser = await sessionizeUser(admin);
-  const token = jwt.sign({ ...sessionUser }, SECRET_KEY, { expiresIn: '8h' });
+  const token = jwt.sign({ ...sessionUser }, SECRET_KEY, { expiresIn: '1h' });
   res.status(200);
   return res.json({ ...sessionUser, token: token });
 };
@@ -34,17 +34,5 @@ const loginTeam = async (req, res, next) => {
   return res.json({ ...sessionUser, token: token });
 };
 
-const logout = async (req, res, next) => {
-  res.status(200);
-  return res.json({ message: 'Utloggad' });
-};
-
-const logoutTeam = async (req, res, next) => {
-  res.status(200);
-  return res.json({ message: 'Utloggad' });
-};
-
 exports.login = asyncWrapper(login);
 exports.loginTeam = asyncWrapper(loginTeam);
-exports.logout = asyncWrapper(logout);
-exports.logoutTeam = asyncWrapper(logoutTeam);
