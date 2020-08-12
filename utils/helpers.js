@@ -20,8 +20,15 @@ exports.createMemberArray = (members) => {
 exports.sessionizeUser = (user) => {
   return {
     id: user._id,
-    name: user.username ? user.username : user.name ? user.name : null,
-    role: user.role ? user.role : null
+    name: user.name
+  };
+};
+
+exports.sessionizeAdmin = (user) => {
+  return {
+    id: user._id,
+    name: user.username,
+    role: user.role
   };
 };
 
