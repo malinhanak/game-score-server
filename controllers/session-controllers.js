@@ -16,7 +16,7 @@ const login = async (req, res, next) => {
     return next(new HttpError(`Användarnamn eller lösenord är felaktigt!`));
   }
   const sessionUser = await sessionizeAdmin(admin);
-  const token = jwt.sign({ ...sessionUser }, SECRET_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ ...sessionUser }, SECRET_KEY, { expiresIn: '8h' });
   res.status(200);
   return res.json({ ...sessionUser, token: token });
 };

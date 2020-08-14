@@ -108,7 +108,7 @@ const getScore = async (req, res, next) => {
 };
 
 const getAllScores = async (req, res, next) => {
-  const scores = await Score.find({});
+  const scores = await Score.find({}, 'team scoreTotal');
 
   if (scores) {
     res.status(200);
@@ -121,7 +121,7 @@ const getAllScores = async (req, res, next) => {
 };
 
 const getTeams = async (req, res, next) => {
-  const teams = await Team.find({});
+  const teams = await Team.find({}, 'name members');
 
   if (teams) {
     res.status(200);
