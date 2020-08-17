@@ -32,10 +32,10 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.options('*', cors(corsOptions));
+app.use('/api/admin', adminRouter);
 app.use('/api/teams', teamRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/api/game', gameRouter);
-app.use('/api/admin', adminRouter);
 
 app.use((req, res, next) => {
   throw new HttpError('Sökvägen hittades inte', 404);
