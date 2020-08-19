@@ -14,7 +14,7 @@ exports.createScoreObject = (games) => {
 };
 
 exports.createMemberArray = (members) => {
-  return members.replace(/, /g, ',').split(',');
+  return members.replace(/[ ]/g, '').split(',');
 };
 
 exports.sessionizeUser = (user) => {
