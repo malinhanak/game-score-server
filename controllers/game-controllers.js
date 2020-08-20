@@ -7,6 +7,14 @@ const { asyncWrapper } = require('../utils/asyncWrapper');
 const { createGameArray, createSlug } = require('../utils/helpers');
 
 const getGames = async (req, res, next) => {
+  const game = await Game.find({});
+  if (!game) return next(new HttpError(`Finns inga spel`));
+
+  res.status(200);
+  return res.json(game);
+};
+
+const getGame = async (req, res, next) => {
   const year = req.params.year;
   const game = await Game.findOne({ year: year });
   if (!game) return next(new HttpError(`Finns inga spel för ${year}`));
@@ -16,9 +24,6 @@ const getGames = async (req, res, next) => {
 };
 
 const create = async (req, res, next) => {
-  if (!req.admin || !req.session.admin.role.includes('ADMIN')) {
-    return next(new HttpError(`Du saknar behörighet`));
-  }
   const { year, games } = req.body;
   const gameArray = createGameArray(games);
   const createGame = new Game({ year: year, games: gameArray });
@@ -80,6 +85,7 @@ const updateRule = async (req, res, next) => {
 exports.create = asyncWrapper(create);
 exports.remove = asyncWrapper(remove);
 exports.getGames = asyncWrapper(getGames);
+exports.getGame = asyncWrapper(getGame);
 exports.createRules = asyncWrapper(createRules);
 exports.getRule = asyncWrapper(getRule);
 exports.updateRule = asyncWrapper(updateRule);
