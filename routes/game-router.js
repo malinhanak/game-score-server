@@ -7,6 +7,7 @@ gameRouter.get('/', gameControllers.getGames);
 gameRouter.post('/', gameControllers.create);
 gameRouter.delete('/', gameControllers.remove);
 gameRouter.post('/rules', gameControllers.createRules);
+gameRouter.get('/rules', gameControllers.getRules);
 gameRouter.get('/rules/:slug', gameControllers.getRule);
 gameRouter.patch('/rules/:slug', gameControllers.updateRule);
 

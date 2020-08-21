@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 
 exports.createGameArray = (games) => {
+  console.log('games', games);
   return games
     .replace(/\s+/g, '')
     .replace(/[ä]/g, 'a')

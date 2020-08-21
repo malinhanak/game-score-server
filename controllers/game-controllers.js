@@ -24,7 +24,9 @@ const getGame = async (req, res, next) => {
 };
 
 const create = async (req, res, next) => {
+  console.log('body', req.body);
   const { year, games } = req.body;
+  console.log('games', games);
   const gameArray = createGameArray(games);
   const createGame = new Game({ year: year, games: gameArray });
   await createGame.save();
@@ -69,6 +71,15 @@ const getRule = async (req, res, next) => {
   return res.json({ rules: game.rules });
 };
 
+const getRules = async (req, res, next) => {
+  const rules = await Rule.find({});
+
+  if (!rules.length) return next(new HttpError('Hittade ingen regel', 404));
+
+  res.status(200);
+  return res.json(rules);
+};
+
 const updateRule = async (req, res, next) => {
   const { slug } = req.params;
   const { rules } = req.body;
@@ -88,4 +99,5 @@ exports.getGames = asyncWrapper(getGames);
 exports.getGame = asyncWrapper(getGame);
 exports.createRules = asyncWrapper(createRules);
 exports.getRule = asyncWrapper(getRule);
+exports.getRules = asyncWrapper(getRules);
 exports.updateRule = asyncWrapper(updateRule);
